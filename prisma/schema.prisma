@@ -30,7 +30,7 @@ model Position {
 model Applicant {
   id          Int               @id @default(autoincrement())
   fullName    String
-  email       String            @unique
+  email       String
   phoneNumber String
   country     String
   city        String

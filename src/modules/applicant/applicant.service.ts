@@ -21,7 +21,7 @@ export async function createApplicant(data: any) {
       },
     });
     return applicant;
-  } catch (error) {
+  } catch (error: any) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
@@ -42,7 +42,7 @@ export async function findPositionIdByTitle(title: string) {
       throw new Error("Position not found");
     }
     return position;
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     throw new Error("Failed to find position");
   }

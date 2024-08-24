@@ -3,11 +3,38 @@ import { applicantSchema } from "./applicant.schema";
 import * as fs from "fs";
 import * as path from "path";
 import { createApplicant, findPositionIdByTitle } from "./applicant.service";
+import { log } from "console";
+
+function base64ToPdf(
+  base64String: string,
+  directory: string,
+  fileName: string
+) {
+  // Remove the data URL prefix if it's included in the base64 string
+  const base64Data = base64String.replace(/^data:application\/pdf;base64,/, "");
+
+  // Convert the base64 string to a buffer
+  const pdfBuffer = Buffer.from(base64Data, "base64");
+
+  // Ensure the directory exists
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory, { recursive: true });
+  }
+
+  // Construct the full file path
+  const filePath = path.join(directory, `${fileName}.pdf`);
+
+  // Write the buffer to a PDF file
+  fs.writeFileSync(filePath, pdfBuffer);
+
+  console.log(`PDF saved to ${filePath}`);
+}
 
 export async function submitApplicant(req: Request, res: Response) {
   try {
     // Validate request body
     const validationResult = applicantSchema.parse(req.body);
+    console.log(validationResult);
 
     const positionTitle = validationResult.position; // Use position field to find the positionId
     if (!positionTitle) {
@@ -33,27 +60,20 @@ export async function submitApplicant(req: Request, res: Response) {
       fs.mkdirSync(positionFolder, { recursive: true });
     }
 
-    // Handle file upload
-    const { file } = req;
-    if (!file || file.mimetype !== "application/pdf") {
-      return res
-        .status(400)
-        .json({ message: "Attachment must be a PDF file." });
-    }
-
-    const resumePath = path.join(positionFolder, file.originalname);
-    fs.renameSync(file.path, resumePath);
-
     // Prepare data for the applicant creation
     const applicantData = {
       ...validationResult,
       positionId,
-      resumeUrl: resumePath,
+      resumeUrl: positionFolder,
     };
 
     // Create applicant
     const applicant = await createApplicant(applicantData);
-
+    base64ToPdf(
+      validationResult.resume,
+      positionFolder,
+      applicant.fullName + applicant.id
+    );
     // Construct response
     const response = {
       status: 200,
@@ -88,7 +108,10 @@ export async function submitApplicant(req: Request, res: Response) {
       });
     }
     return res.status(500).json({
+      status: 500,
       message: "An error occurred while submitting the application.",
+      data: null,
+      success: false,
     });
   }
 }
