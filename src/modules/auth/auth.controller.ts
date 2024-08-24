@@ -1,111 +1,79 @@
-import type { Request } from "express";
-import type { User } from "@prisma/client";
-import type { AuthTypes } from "./auth.schema";
+import { Request, Response } from "express";
+import { INVALID, ZodError } from "zod";
+import { ENV } from "../../utils/env.util";
+import { sign } from "jsonwebtoken";
+import { userSignInSchema, userSignUpSchema } from "./auth.schema";
+import { SignUp } from "./auth.service";
+import { findUserByEmail } from "../user/user.service";
+import bcrypt from "bcrypt";
+import { Prisma } from "@prisma/client";
 
-import { ResponseMapper } from "../../common/mapper/response.mapper";
-import {
-  BadRequestException,
-  NotFoundException,
-} from "../../utils/exception.util";
-
-import { jwtService } from "../jwt/jwt.service";
-import { userService } from "../user/user.service";
-import { authService } from "./auth.service";
-import { commonService } from "../common/common.service";
-import { LoggerService } from "../../utils/logger.util";
-
-import { JWT_TYPE } from "../jwt/enum/jwt.enum";
-
-class AuthController {
-  private readonly logger = LoggerService(AuthController.name);
-
-  async loginHandler(req: Request) {
-    try {
-      const body = req.body as AuthTypes.Login;
-      const user = await userService.findUnique({
-        where: { email: body.email },
-      });
-      if (!user) throw new NotFoundException("User not found");
-      if (!user.isActive) throw new BadRequestException("Pending approval");
-      if (user.password != body.password)
-        throw new BadRequestException("Invalid credentials");
-
-      const userWithoutPassword = commonService.exclude(user, ["password"]);
-      const accessToken = await jwtService.signPayload(
-        userWithoutPassword,
-        JWT_TYPE.ACCESS
-      );
-      const refreshToken = await jwtService.signPayload(
-        userWithoutPassword,
-        JWT_TYPE.REFRESH
-      );
-
-      await authService.upsert({ userId: user.id, refreshToken });
-
-      return ResponseMapper.map({
-        data: { user: userWithoutPassword, accessToken, refreshToken },
-      });
-    } catch (error: any) {
-      this.logger.error(error.message);
-      throw error;
+export async function signUpUserHandler(req: Request, res: Response) {
+  try {
+    const data = userSignUpSchema.parse(req.body);
+    const existingEmail = await findUserByEmail(data.email);
+    if (existingEmail) throw new Error(`Email must be unique`);
+    const salt = await bcrypt.genSalt();
+    data.password = await bcrypt.hash(req.body.password, salt);
+    const user = await SignUp(data);
+    res
+      .status(200)
+      .json({ status: 200, message: "Success", data: null, success: true });
+  } catch (error: any) {
+    if (error instanceof ZodError) {
+      const messageJSON = JSON.parse(error.message);
+      const message = `${messageJSON[0].path[0]} is ${messageJSON[0].message}`;
+      console.error(message);
+      return res
+        .status(400)
+        .json({ status: 400, message: message, data: null, success: false });
     }
-  }
-
-  async signupHandler(req: Request) {
-    try {
-      const body = req.body as AuthTypes.Signup;
-      const user = await userService.findUnique({
-        where: { email: body.email },
-      });
-      if (user) throw new BadRequestException("Email already exists");
-
-      await userService.create({
-        data: {
-          email: body.email,
-          password: body.password,
-          username: body.username,
-        },
-      });
-
-      return ResponseMapper.map({ message: "Registered Successfully" });
-    } catch (error: any) {
-      this.logger.error(error.message);
-      throw error;
-    }
-  }
-
-  async refreshAccessHandler(req: Request) {
-    try {
-      const body = req.body as AuthTypes.Refresh;
-      const session = await authService.findOneByRefreshToken(
-        body.refreshToken
-      );
-      if (!session) throw new NotFoundException("Session not found");
-
-      const user = (await jwtService.verifyToken(
-        body.refreshToken,
-        JWT_TYPE.REFRESH
-      )) as User;
-      const userWithoutPassword = commonService.exclude(user, ["password"]);
-
-      const accessToken = await jwtService.signPayload(
-        userWithoutPassword,
-        JWT_TYPE.ACCESS
-      );
-      const refreshToken = await jwtService.signPayload(
-        userWithoutPassword,
-        JWT_TYPE.REFRESH
-      );
-
-      return ResponseMapper.map({
-        data: { user: userWithoutPassword, refreshToken, accessToken },
-      });
-    } catch (error: any) {
-      this.logger.error(error.message);
-      throw error;
-    }
+    console.error(error.message);
+    return res.status(400).json({
+      status: 400,
+      message: error.message,
+      data: null,
+      success: false,
+    });
   }
 }
 
-export const authController =
-  commonService.getOrCreateSingleton(AuthController);
+export async function SignInUserHandler(req: Request, res: Response) {
+  try {
+    const data = userSignInSchema.parse(req.body);
+    const user = await findUserByEmail(data.email);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const isCorrect = await bcrypt.compare(data.password, user.password);
+    if (!isCorrect) throw new Error("Invalid credentials");
+    // if (user.isActive == false) throw new Error("Account disabled...");
+    const { password, ...rest } = user;
+    const token = sign(rest, ENV.JWT_SECRET, { expiresIn: "1d" });
+
+    return res.status(200).json({
+      status: 200,
+      message: "Sign in successful",
+      data: { ...rest, token },
+      success: true,
+    });
+  } catch (error: any) {
+    if (error instanceof ZodError) {
+      const messageJSON = JSON.parse(error.message);
+      const message = `${messageJSON[0].path[0]} is ${messageJSON[0].message}`;
+      console.error(message);
+      return res
+        .status(400)
+        .json({ status: 400, message: message, data: null, success: false });
+    }
+    console.error(error.message);
+    return res.status(400).json({
+      status: 400,
+      message: error.message,
+      data: null,
+      success: false,
+    });
+  }
+}

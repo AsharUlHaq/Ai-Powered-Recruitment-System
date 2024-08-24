@@ -7,25 +7,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  ADMIN
-  USER
-}
-
 model User {
   id        Int      @id @default(autoincrement())
-  isActive  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  username  String
   email     String   @unique
   password  String
-  role      UserRole @default(USER)
-  session   Session?
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Session {
-  userId       Int    @id
-  user         User   @relation(fields: [userId], references: [id])
-  refreshToken String @unique
+model Position {
+  id               Int         @id @default(autoincrement())
+  title            String
+  experience       String
+  numberOfOpenings Int
+  isActive         Boolean     @default(true)
+  applicants       Applicant[]
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+}
+
+model Applicant {
+  id          Int               @id @default(autoincrement())
+  fullName    String
+  email       String
+  phoneNumber String
+  country     String
+  city        String
+  appliedFor  Position          @relation(fields: [positionId], references: [id])
+  positionId  Int
+  resumeUrl   String
+  status      ApplicationStatus @default(DRAFT)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+enum Role {
+  ADMIN
+}
+
+enum ApplicationStatus {
+  DRAFT
+  HIRED
+  REJECTED
 }

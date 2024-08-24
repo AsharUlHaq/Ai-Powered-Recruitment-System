@@ -1,27 +1,20 @@
-import type { Prisma } from "@prisma/client";
-import { prisma } from "../../utils/db.util";
-import { commonService } from "../common/common.service";
+import prisma from "../../utils/db.util";
+import { Prisma } from "@prisma/client";
 
-class UserService {
-  async findOneById(id: number, select?: Prisma.UserSelect) {
-    return prisma.user.findUnique({ where: { id }, select });
-  }
-
-  async findUnique(args: Prisma.UserFindUniqueArgs) {
-    return prisma.user.findUnique(args);
-  }
-
-  async findMany(args: Prisma.UserFindManyArgs) {
-    return prisma.user.findMany(args);
-  }
-
-  async create(args: Prisma.UserCreateArgs) {
-    return prisma.user.create(args);
-  }
-
-  async update(args: Prisma.UserUpdateArgs) {
-    return prisma.user.update(args);
-  }
+export async function findUserByEmail(email: string) {
+  const user = await prisma.user.findUnique({ where: { email: email } });
+  return user;
 }
 
-export const userService = commonService.getOrCreateSingleton(UserService);
+export async function findUserById(id: number) {
+  try {
+    const userId = await prisma.user.findUnique({ where: { id } });
+    if (!userId) throw new Error(`User at id:${id} not exist`);
+    return userId;
+  } catch (error: any) {
+    if (error.code === "P2025") {
+      const recordNotFound = error.meta[1];
+      return recordNotFound;
+    }
+  }
+}

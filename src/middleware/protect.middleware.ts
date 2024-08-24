@@ -1,32 +1,28 @@
-import type { Handler } from "express";
-import { jwtService } from "../modules/jwt/jwt.service";
-import { User } from "@prisma/client";
-import { ResponseMapper } from "../common/mapper/response.mapper";
-import { HttpStatus } from "../utils/http-status.util";
-import { JWT_TYPE } from "../modules/jwt/enum/jwt.enum";
+import { NextFunction, Request, Response } from "express";
+import { verify } from "jsonwebtoken";
+import { ENV } from "../utils/env.util";
 
-export const protect: Handler = async (req, res, next) => {
+export async function protect(req: Request, res: Response, next: NextFunction) {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) throw new Error();
-    if (!authHeader.startsWith("Bearer")) throw new Error();
+    const authorizationHeader = req.headers.authorization;
+    if (!authorizationHeader)
+      throw new Error("No authorization header provided");
 
-    const [, token] = authHeader.split(" ");
-    if (!token) throw new Error();
+    const [bearer, token] = authorizationHeader.split(" ");
 
-    const payload = (await jwtService.verifyToken(
-      token,
-      JWT_TYPE.ACCESS
-    )) as User;
-    req["userId"] = payload.id;
+    if (bearer !== "Bearer") throw new Error("Invalid token format");
+    if (!token) throw new Error("Token not provided");
 
+    const payload: any = verify(token, ENV.JWT_SECRET);
+    const userId = payload.id;
+    (req as any)["userId"] = userId;
     next();
-  } catch (error) {
-    return res.status(HttpStatus.UNAUTHORIZED).json(
-      ResponseMapper.map({
-        status: HttpStatus.UNAUTHORIZED,
-        message: HttpStatus.UNAUTHORIZED_MESSAGE,
-      })
-    );
+  } catch (error: any) {
+    res.status(401).json({
+      status: 401,
+      message: "Unauthorized",
+      data: null,
+      success: false,
+    });
   }
-};
+}
