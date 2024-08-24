@@ -18,7 +18,7 @@ model User {
 
 model Position {
   id               Int         @id @default(autoincrement())
-  title            String
+  title            String      @unique
   experience       String
   numberOfOpenings Int
   isActive         Boolean     @default(true)
@@ -30,7 +30,7 @@ model Position {
 model Applicant {
   id          Int               @id @default(autoincrement())
   fullName    String
-  email       String
+  email       String            @unique
   phoneNumber String
   country     String
   city        String
