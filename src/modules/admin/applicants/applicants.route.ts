@@ -19,11 +19,11 @@ adminPortalApplicantRoutes.get(
 adminPortalApplicantRoutes.get("/getOneApplicant/:id", getApplicantByIdHandler);
 
 // Route to update applicant status (hire or reject)
-adminPortalApplicantRoutes.patch("/:id/status", updateApplicantStatusHandler);
+adminPortalApplicantRoutes.patch("/applicantStatus/:id/status", updateApplicantStatusHandler);
 
 // Route to find applicants by position ID
 adminPortalApplicantRoutes.get(
-  "/position/:positionId",
+  "/applicantsByPosition/:positionId",
   findApplicantsByPositionHandler
 );
 

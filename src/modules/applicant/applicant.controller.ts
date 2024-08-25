@@ -12,43 +12,35 @@ function base64ToPdf(
 ) {
   // Remove the data URL prefix if it's included in the base64 string
   const base64Data = base64String.replace(/^data:application\/pdf;base64,/, "");
-
   // Convert the base64 string to a buffer
   const pdfBuffer = Buffer.from(base64Data, "base64");
-
   // Ensure the directory exists
   if (!fs.existsSync(directory)) {
     fs.mkdirSync(directory, { recursive: true });
   }
-
   // Construct the full file path
   const filePath = path.join(directory, `${fileName}.pdf`);
-
   // Write the buffer to a PDF file
   fs.writeFileSync(filePath, pdfBuffer);
-
   console.log(`PDF saved to ${filePath}`);
 }
 
 export async function submitApplicant(req: Request, res: Response) {
   try {
+    console.log(req.body)
     // Validate request body
     const validationResult = applicantSchema.parse(req.body);
     console.log(validationResult);
-
-    const positionTitle = validationResult.position; // Use position field to find the positionId
+    const positionTitle = validationResult.position;
     if (!positionTitle) {
       return res.status(400).json({ message: "Position is required." });
     }
-
-    // Find the positionId by position title
     const position = await findPositionIdByTitle(positionTitle);
     if (!position) {
       return res.status(404).json({ message: "Position not found." });
     }
 
     const positionId = position.id;
-
     // Ensure the position folder exists
     const positionFolder = path.join(
       __dirname,
@@ -107,8 +99,8 @@ export async function submitApplicant(req: Request, res: Response) {
         })),
       });
     }
-    return res.status(500).json({
-      status: 500,
+    return res.status(400).json({
+      status: 400,
       message: "An error occurred while submitting the application.",
       data: null,
       success: false,

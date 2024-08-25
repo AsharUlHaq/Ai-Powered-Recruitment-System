@@ -20,8 +20,8 @@ export async function getAllPositionsHandler(req: Request, res: Response) {
     });
   } catch (error: any) {
     console.error(error.message);
-    return res.status(500).json({
-      status: 500,
+    return res.status(400).json({
+      status: 400,
       message: "Failed to retrieve positions",
       data: null,
       success: false,
@@ -53,8 +53,8 @@ export async function createPositionHandler(req: Request, res: Response) {
       });
     }
     console.error(error.message);
-    return res.status(500).json({
-      status: 500,
+    return res.status(400).json({
+      status: 400,
       message: "Failed to create position",
       data: null,
       success: false,
@@ -95,8 +95,8 @@ export async function updatePositionHandler(req: Request, res: Response) {
       });
     }
     console.error(error.message);
-    return res.status(500).json({
-      status: 500,
+    return res.status(400).json({
+      status: 400,
       message: "Failed to update position",
       data: null,
       success: false,
@@ -125,8 +125,8 @@ export async function togglePositionStatusHandler(req: Request, res: Response) {
     });
   } catch (error: any) {
     console.error(error.message);
-    return res.status(500).json({
-      status: 500,
+    return res.status(400).json({
+      status: 400,
       message: "Failed to update position status",
       data: null,
       success: false,

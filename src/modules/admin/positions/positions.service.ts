@@ -10,7 +10,7 @@ export async function getAllPositions() {
 // Create a new position
 export async function createPosition(data: {
   title: string;
-  experience?: string; // Experience can be undefined
+  experience?: string; 
   numberOfOpenings: number;
 }) {
   return await prisma.position.create({
