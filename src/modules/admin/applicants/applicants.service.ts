@@ -101,3 +101,15 @@ export async function checkPositionExists(positionId: number): Promise<boolean> 
     throw new Error("Failed to check position existence");
   }
 }
+
+export async function updateApplicantMatchScore(applicantId: number, matchScore: number) {
+  try {
+    await prisma.applicant.update({
+      where: { id: applicantId },
+      data: { matchScore },
+    });
+  } catch (error: any) {
+    console.error("Error updating match score:", error);
+    throw new Error("Failed to update match score");
+  }
+}

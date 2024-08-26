@@ -8,6 +8,7 @@ import { applicantRoutes } from "./modules/applicant/applicant.route";
 import { positionRoutes } from "./modules/admin/positions/position.route";
 import { authRoutes } from "./modules/auth/auth.route";
 import { adminPortalApplicantRoutes } from "./modules/admin/applicants/applicants.route";
+import { adminDashboardRoutes } from "./modules/admin/dashboard/dashboard.route";
 
 const app = express();
 app.use(express.json({ limit: "10mb" }));
@@ -28,6 +29,7 @@ app.use("/", applicantRoutes);
 app.use("/", positionRoutes);
 app.use("/", authRoutes);
 app.use("/",adminPortalApplicantRoutes)
+app.use("/",adminDashboardRoutes)
 
 app.listen(ENV.PORT, () => {
   console.log(`Application running at http://localhost:${ENV.PORT}`);

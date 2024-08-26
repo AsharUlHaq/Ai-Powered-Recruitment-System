@@ -125,10 +125,11 @@ export async function getApplicantByIdHandler(req: Request, res: Response) {
     });
   }
 }
-// Handler to update applicant status
+
+// / Handler to update applicant status
 export async function updateApplicantStatusHandler(req: Request, res: Response) {
   const id = parseInt(req.params.id);
-  const { status } = req.body;
+  const { status } = req.query;
 
   try {
     // Validate request body
@@ -137,7 +138,17 @@ export async function updateApplicantStatusHandler(req: Request, res: Response) 
     if (isNaN(id)) {
       return res.status(400).json({
         status: 400,
-        message: "Invalid applicant ID provided.",
+        message: 'Invalid applicant ID provided.',
+        data: null,
+        success: false,
+      });
+    }
+
+    // Ensure the status is a valid ApplicationStatus
+    if (!Object.values(ApplicationStatus).includes(status as ApplicationStatus)) {
+      return res.status(400).json({
+        status: 400,
+        message: 'Invalid status value provided.',
         data: null,
         success: false,
       });
@@ -148,7 +159,7 @@ export async function updateApplicantStatusHandler(req: Request, res: Response) 
 
     return res.status(200).json({
       status: 200,
-      message: "Applicant status updated successfully.",
+      message: 'Applicant status updated successfully.',
       data: null,
       success: true,
     });
@@ -159,17 +170,17 @@ export async function updateApplicantStatusHandler(req: Request, res: Response) 
     if (error instanceof ZodError) {
       return res.status(400).json({
         status: 400,
-        message: "Invalid status value provided.",
+        message: 'Invalid status value provided.',
         data: null,
         success: false,
       });
     }
 
     // Handle Prisma-specific errors
-    if (error.message.includes("Failed to update applicant status")) {
+    if (error.message.includes('Failed to update applicant status')) {
       return res.status(500).json({
         status: 500,
-        message: "An error occurred while updating the applicant status.",
+        message: 'An error occurred while updating the applicant status.',
         data: null,
         success: false,
       });
@@ -178,13 +189,12 @@ export async function updateApplicantStatusHandler(req: Request, res: Response) 
     // Handle any other unexpected errors
     return res.status(500).json({
       status: 500,
-      message: "An unexpected error occurred.",
+      message: 'An unexpected error occurred.',
       data: null,
       success: false,
     });
   }
 }
-
 
 
 export async function findApplicantsByPositionHandler(req: Request, res: Response) {
