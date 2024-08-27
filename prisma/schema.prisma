@@ -39,7 +39,7 @@ model Applicant {
   positionId  Int
   resumeUrl   String
   status      ApplicationStatus @default(DRAFT)
-  matchScore  Float?           
+  matchScore  Int?           
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 }

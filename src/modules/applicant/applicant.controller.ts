@@ -315,7 +315,7 @@ export async function submitApplicant(req: Request, res: Response) {
       position.description,
       validationResult.resume
     );
-
+    console.log(`Calculated match score: ${matchScore}`);
     // Update the applicant's match score in the database
     await prisma.applicant.update({
       where: { id: applicant.id },
@@ -341,7 +341,7 @@ export async function submitApplicant(req: Request, res: Response) {
         status: applicant.status,
         createdAt: applicant.createdAt,
         updatedAt: applicant.updatedAt,
-        matchScore: applicant.matchScore,
+        matchScore: matchScore,
       },
       success: true,
     };
