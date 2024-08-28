@@ -52,3 +52,71 @@ export async function getApplicantSummary() {
 
   return summary;
 }
+
+export async function getApplicantStatusSummary() {
+  // Fetch total number of open positions
+  const totalOpenPositions = await prisma.position.count({
+    where: {
+      isActive: true,
+    },
+  });
+
+  // Group applicants by position and status
+  const applicantGroups = await prisma.applicant.groupBy({
+    by: ["positionId", "status"],
+    _count: {
+      status: true,
+    },
+  });
+
+  // Fetch position titles
+  const positionIds = [
+    ...new Set(applicantGroups.map((group) => group.positionId)),
+  ];
+  const positions = await prisma.position.findMany({
+    where: {
+      id: { in: positionIds },
+    },
+    select: {
+      id: true,
+      title: true,
+    },
+  });
+
+  // Map position titles
+  const positionTitleMap = positions.reduce((map, position) => {
+    map[position.id] = position.title;
+    return map;
+  }, {} as Record<number, string>);
+
+  // Structure the data
+  const positionSummary: Record<
+    string,
+    { totalApplicants: number; hired: number; rejected: number }
+  > = {};
+
+  applicantGroups.forEach((group) => {
+    const positionTitle =
+      positionTitleMap[group.positionId] || "Unknown Position";
+
+    if (!positionSummary[positionTitle]) {
+      positionSummary[positionTitle] = {
+        totalApplicants: 0,
+        hired: 0,
+        rejected: 0,
+      };
+    }
+
+    positionSummary[positionTitle].totalApplicants += group._count.status;
+    if (group.status === ApplicationStatus.HIRED) {
+      positionSummary[positionTitle].hired += group._count.status;
+    } else if (group.status === ApplicationStatus.REJECTED) {
+      positionSummary[positionTitle].rejected += group._count.status;
+    }
+  });
+
+  return {
+    totalOpenPositions,
+    positionSummary,
+  };
+}
