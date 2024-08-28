@@ -331,8 +331,8 @@ export async function getApplicantsByPositionHandler(
     });
   } catch (error: any) {
     console.error(error.message);
-    return res.status(500).json({
-      status: 500,
+    return res.status(400).json({
+      status: 400,
       message: "Failed to retrieve applicants",
       data: null,
       success: false,

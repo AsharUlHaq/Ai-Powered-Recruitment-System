@@ -1,7 +1,7 @@
 // aiSearch.controller.ts
-import { Request, Response } from 'express';
-import { calculateMatchScore } from './aiSearch.service';
-import { PrismaClient } from '@prisma/client';
+import { Request, Response } from "express";
+import { calculateMatchScore } from "./aiSearch.service";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -10,7 +10,7 @@ export async function evaluateApplicant(req: Request, res: Response) {
     const { applicantId, jobDescription, resumeBase64 } = req.body;
 
     if (!applicantId || !jobDescription || !resumeBase64) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
     const matchScore = await calculateMatchScore(jobDescription, resumeBase64);
@@ -23,15 +23,16 @@ export async function evaluateApplicant(req: Request, res: Response) {
 
     return res.status(200).json({
       status: 200,
-      message: 'Match score calculated and updated successfully',
+      message: "Match score calculated and updated successfully",
       data: { matchScore },
       success: true,
     });
   } catch (error: any) {
     console.error(error);
-    return res.status(500).json({
-      status: 500,
-      message: 'An error occurred while evaluating the applicant.',
+    return res.status(400).json({
+      status: 400,
+      message: "An error occurred while evaluating the applicant.",
+      data: null,
       success: false,
     });
   }

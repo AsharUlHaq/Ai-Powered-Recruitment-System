@@ -211,7 +211,7 @@
 //         status: applicant.status,
 //         createdAt: applicant.createdAt,
 //         updatedAt: applicant.updatedAt,
-//         matchScore: applicant.matchScore, 
+//         matchScore: applicant.matchScore,
 //       },
 //       success: true,
 //     };
@@ -237,13 +237,13 @@
 //   }
 // }
 
-import { Request, Response } from 'express';
-import { applicantSchema } from './applicant.schema';
-import * as fs from 'fs';
-import * as path from 'path';
-import { createApplicant, findPositionIdByTitle } from './applicant.service';
-import { calculateMatchScore } from '../admin/Ai-Search/aiSearch.service'; // Import the function
-import prisma from '../../utils/db.util';
+import { Request, Response } from "express";
+import { applicantSchema } from "./applicant.schema";
+import * as fs from "fs";
+import * as path from "path";
+import { createApplicant, findPositionIdByTitle } from "./applicant.service";
+import { calculateMatchScore } from "../admin/Ai-Search/aiSearch.service"; // Import the function
+import prisma from "../../utils/db.util";
 
 function base64ToPdf(
   base64String: string,
@@ -251,9 +251,9 @@ function base64ToPdf(
   fileName: string
 ) {
   // Remove the data URL prefix if it's included in the base64 string
-  const base64Data = base64String.replace(/^data:application\/pdf;base64,/, '');
+  const base64Data = base64String.replace(/^data:application\/pdf;base64,/, "");
   // Convert the base64 string to a buffer
-  const pdfBuffer = Buffer.from(base64Data, 'base64');
+  const pdfBuffer = Buffer.from(base64Data, "base64");
   // Ensure the directory exists
   if (!fs.existsSync(directory)) {
     fs.mkdirSync(directory, { recursive: true });
@@ -267,25 +267,28 @@ function base64ToPdf(
 
 export async function submitApplicant(req: Request, res: Response) {
   try {
-    console.log(req.body)
+    console.log(req.body);
     // Validate request body
     const validationResult = applicantSchema.parse(req.body);
     console.log(validationResult);
     const positionTitle = validationResult.position;
     if (!positionTitle) {
-      return res.status(400).json({ message: 'Position is required.' });
+      return res.status(400).json({ message: "Position is required." });
     }
     const position = await findPositionIdByTitle(positionTitle);
     if (!position) {
-      return res.status(404).json({ message: 'Position not found.' });
+      return res.status(404).json({ message: "Position not found." });
     }
 
     const positionId = position.id;
     // Define a unique filename for the resume
-    const resumeFileName = `${validationResult.fullName.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
+    const resumeFileName = `${validationResult.fullName.replace(
+      /\s+/g,
+      "_"
+    )}_${Date.now()}.pdf`;
     const positionFolder = path.join(
       __dirname,
-      '../../../uploads/',
+      "../../../uploads/",
       positionTitle
     );
 
@@ -306,7 +309,7 @@ export async function submitApplicant(req: Request, res: Response) {
     const applicant = await createApplicant(applicantData);
     base64ToPdf(
       validationResult.resume,
-      path.join(__dirname, '../../../uploads/', positionTitle), // Path for saving the resume
+      path.join(__dirname, "../../../uploads/", positionTitle), // Path for saving the resume
       resumeFileName
     );
 
@@ -325,7 +328,7 @@ export async function submitApplicant(req: Request, res: Response) {
     // Construct response
     const response = {
       status: 200,
-      message: 'Applicant created and evaluated successfully',
+      message: "Applicant created and evaluated successfully",
       data: {
         id: applicant.id,
         fullName: applicant.fullName,
@@ -349,9 +352,9 @@ export async function submitApplicant(req: Request, res: Response) {
     return res.status(201).json(response);
   } catch (error: any) {
     console.error(error);
-    if (error.name === 'ZodError') {
+    if (error.name === "ZodError") {
       return res.status(400).json({
-        message: 'Validation failed',
+        message: "Validation failed",
         details: error.errors.map((err: any) => ({
           path: err.path,
           message: err.message,
@@ -360,7 +363,7 @@ export async function submitApplicant(req: Request, res: Response) {
     }
     return res.status(400).json({
       status: 400,
-      message: 'An error occurred while submitting the application.',
+      message: "An error occurred while submitting the application.",
       data: null,
       success: false,
     });
