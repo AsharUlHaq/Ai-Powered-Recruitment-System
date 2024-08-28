@@ -4,7 +4,6 @@ import axios from "axios";
 
 const prisma = new PrismaClient();
 
-
 export async function getApplicantsByStatus(status: ApplicationStatus) {
   try {
     const applicants = await prisma.applicant.findMany({
@@ -14,7 +13,7 @@ export async function getApplicantsByStatus(status: ApplicationStatus) {
     return applicants;
   } catch (error: any) {
     console.error("Error fetching applicants by status:", error.message);
-    
+
     throw new Error("Failed to retrieve applicants. Please try again later.");
   }
 }
@@ -28,7 +27,7 @@ export async function getApplicantById(id: number) {
 
     // Return null if no applicant is found
     return applicant;
-  } catch (error:any) {
+  } catch (error: any) {
     console.error("Failed to retrieve applicant:", error.message);
 
     // Handle Prisma-specific errors
@@ -41,7 +40,6 @@ export async function getApplicantById(id: number) {
   }
 }
 
-
 export async function updateApplicantStatus(
   id: number,
   status: ApplicationStatus
@@ -51,7 +49,7 @@ export async function updateApplicantStatus(
       where: { id },
       data: { status },
     });
-  } catch (error:any) {
+  } catch (error: any) {
     if (error instanceof PrismaClientKnownRequestError) {
       // Handle specific Prisma error
       console.error("Prisma error:", error.message);
@@ -68,7 +66,7 @@ export async function findApplicantsByPosition(positionId: number) {
       include: { appliedFor: true },
     });
     return applicants;
-  } catch (error:any) {
+  } catch (error: any) {
     console.error(error.message);
     throw new Error("Failed to find applicants by position");
   }
@@ -84,25 +82,30 @@ export async function aiBasedApplicantSearch(
       numberOfCandidates,
     });
     return response.data;
-  } catch (error:any) {
+  } catch (error: any) {
     console.error(error.message);
     throw new Error("Failed to perform AI-based search");
   }
 }
 
-export async function checkPositionExists(positionId: number): Promise<boolean> {
+export async function checkPositionExists(
+  positionId: number
+): Promise<boolean> {
   try {
     const position = await prisma.position.findUnique({
-      where: { id: positionId }
+      where: { id: positionId },
     });
     return position !== null;
-  } catch (error:any) {
+  } catch (error: any) {
     console.error(error.message);
     throw new Error("Failed to check position existence");
   }
 }
 
-export async function updateApplicantMatchScore(applicantId: number, matchScore: number) {
+export async function updateApplicantMatchScore(
+  applicantId: number,
+  matchScore: number
+) {
   try {
     await prisma.applicant.update({
       where: { id: applicantId },

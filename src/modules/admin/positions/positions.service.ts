@@ -10,7 +10,7 @@
 // // Create a new position
 // export async function createPosition(data: {
 //   title: string;
-//   experience?: string; 
+//   experience?: string;
 //   numberOfOpenings: number;
 // }) {
 //   return await prisma.position.create({
@@ -72,14 +72,14 @@ export async function createPosition(data: {
   title: string;
   experience?: string;
   numberOfOpenings: number;
-  description: string; // New field for description
+  description: string;
 }) {
   return await prisma.position.create({
     data: {
       title: data.title,
-      experience: data.experience ?? "", // Default to an empty string if undefined
+      experience: data.experience ?? "",
       numberOfOpenings: data.numberOfOpenings,
-      description: data.description, // Include job description
+      description: data.description,
     },
   });
 }
@@ -91,16 +91,16 @@ export async function updatePosition(
     title?: string;
     experience?: string;
     numberOfOpenings?: number;
-    description?: string; // Optional description update
+    description?: string;
   }
 ) {
   return await prisma.position.update({
     where: { id: positionId },
     data: {
       title: data.title,
-      experience: data.experience ?? "", // Default to an empty string if undefined
+      experience: data.experience ?? "",
       numberOfOpenings: data.numberOfOpenings,
-      description: data.description, // Update job description if provided
+      description: data.description,
     },
   });
 }

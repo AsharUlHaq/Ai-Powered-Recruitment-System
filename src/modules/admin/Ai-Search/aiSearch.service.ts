@@ -119,45 +119,53 @@
 //   }
 // }
 
-import axios from 'axios';
-import prisma from '../../../utils/db.util';
+import axios from "axios";
+import prisma from "../../../utils/db.util";
 
-const FLASK_SERVER_URL = 'https://687f-34-143-191-56.ngrok-free.app/comparison'; // Replace with your Flask server URL
+const FLASK_SERVER_URL = "https://687f-34-143-191-56.ngrok-free.app/comparison"; // Replace with your Flask server URL
 
-export async function calculateMatchScore(jobDescription: string, resumeBase64: string): Promise<number> {
+export async function calculateMatchScore(
+  jobDescription: string,
+  resumeBase64: string
+): Promise<number> {
   try {
     const response = await axios.post(FLASK_SERVER_URL, {
       JobDesc: jobDescription,
       ResumeData: resumeBase64,
     });
 
-    console.log('Flask server response:', response.data); // For debugging
+    console.log("Flask server response:", response.data); // For debugging
 
     // Directly extract matchScore from response
     const matchScore = response.data.matchScore;
 
     // Check type and ensure it's a number
-    if (typeof matchScore !== 'number') {
+    if (typeof matchScore !== "number") {
       throw new Error(`Invalid match score type: ${typeof matchScore}`);
     }
 
     return matchScore;
   } catch (error: any) {
-    console.error('Error communicating with Flask server:', error.message);
-    throw new Error('Failed to calculate match score');
+    console.error("Error communicating with Flask server:", error.message);
+    throw new Error("Failed to calculate match score");
   }
 }
 
 // Function to update the applicant's match score in the database
-export async function updateApplicantMatchScore(applicantId: number, matchScore: number) {
+export async function updateApplicantMatchScore(
+  applicantId: number,
+  matchScore: number
+) {
   try {
-    console.log(`Updating match score for applicant ${applicantId} to ${matchScore}`);
+    console.log(
+      `Updating match score for applicant ${applicantId} to ${matchScore}`
+    );
     await prisma.applicant.update({
       where: { id: applicantId },
       data: { matchScore },
     });
   } catch (error: any) {
-    console.error('Error updating match score:', error.message);
-    throw new Error('Failed to update match score');
+    console.error("Error updating match score:", error.message);
+    throw new Error("Failed to update match score");
   }
 }
