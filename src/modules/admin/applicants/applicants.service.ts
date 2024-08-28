@@ -116,3 +116,19 @@ export async function updateApplicantMatchScore(
     throw new Error("Failed to update match score");
   }
 }
+
+export async function getApplicantsByPositionWithSortingMatchScore(
+  positionId: number
+) {
+  // Fetch all applicants for the given position and sort by matchScore in descending order
+  const applicants = await prisma.applicant.findMany({
+    where: {
+      positionId: positionId,
+    },
+    orderBy: {
+      matchScore: "desc", // Sort applicants by matchScore in descending order
+    },
+  });
+
+  return applicants;
+}

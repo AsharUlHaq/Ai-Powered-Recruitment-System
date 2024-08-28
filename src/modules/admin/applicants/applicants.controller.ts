@@ -6,6 +6,7 @@ import {
   findApplicantsByPosition,
   aiBasedApplicantSearch,
   checkPositionExists,
+  getApplicantsByPositionWithSortingMatchScore,
 } from "./applicants.service";
 import { ApplicationStatus } from "@prisma/client";
 import {
@@ -21,10 +22,11 @@ export async function getApplicantsHandler(req: Request, res: Response) {
 
   try {
     // Validate the status parameter
-    if (!status || !['DRAFT', 'HIRED', 'REJECTED'].includes(status)) {
+    if (!status || !["DRAFT", "HIRED", "REJECTED"].includes(status)) {
       return res.status(400).json({
         status: 400,
-        message: "Invalid status value provided. Valid values are 'DRAFT', 'HIRED', 'REJECTED'.",
+        message:
+          "Invalid status value provided. Valid values are 'DRAFT', 'HIRED', 'REJECTED'.",
         data: null,
         success: false,
       });
@@ -39,7 +41,7 @@ export async function getApplicantsHandler(req: Request, res: Response) {
       success: true,
     });
   } catch (error: any) {
-    console.error(error.message)
+    console.error(error.message);
     if (error instanceof ZodError) {
       return res.status(400).json({
         status: 400,
@@ -58,7 +60,6 @@ export async function getApplicantsHandler(req: Request, res: Response) {
     });
   }
 }
-
 
 // Handler to get applicant by ID
 export async function getApplicantByIdHandler(req: Request, res: Response) {
@@ -127,7 +128,10 @@ export async function getApplicantByIdHandler(req: Request, res: Response) {
 }
 
 // / Handler to update applicant status
-export async function updateApplicantStatusHandler(req: Request, res: Response) {
+export async function updateApplicantStatusHandler(
+  req: Request,
+  res: Response
+) {
   const id = parseInt(req.params.id);
   const { status } = req.query;
 
@@ -138,17 +142,19 @@ export async function updateApplicantStatusHandler(req: Request, res: Response) 
     if (isNaN(id)) {
       return res.status(400).json({
         status: 400,
-        message: 'Invalid applicant ID provided.',
+        message: "Invalid applicant ID provided.",
         data: null,
         success: false,
       });
     }
 
     // Ensure the status is a valid ApplicationStatus
-    if (!Object.values(ApplicationStatus).includes(status as ApplicationStatus)) {
+    if (
+      !Object.values(ApplicationStatus).includes(status as ApplicationStatus)
+    ) {
       return res.status(400).json({
         status: 400,
-        message: 'Invalid status value provided.',
+        message: "Invalid status value provided.",
         data: null,
         success: false,
       });
@@ -159,7 +165,7 @@ export async function updateApplicantStatusHandler(req: Request, res: Response) 
 
     return res.status(200).json({
       status: 200,
-      message: 'Applicant status updated successfully.',
+      message: "Applicant status updated successfully.",
       data: null,
       success: true,
     });
@@ -170,17 +176,17 @@ export async function updateApplicantStatusHandler(req: Request, res: Response) 
     if (error instanceof ZodError) {
       return res.status(400).json({
         status: 400,
-        message: 'Invalid status value provided.',
+        message: "Invalid status value provided.",
         data: null,
         success: false,
       });
     }
 
     // Handle Prisma-specific errors
-    if (error.message.includes('Failed to update applicant status')) {
+    if (error.message.includes("Failed to update applicant status")) {
       return res.status(500).json({
         status: 500,
-        message: 'An error occurred while updating the applicant status.',
+        message: "An error occurred while updating the applicant status.",
         data: null,
         success: false,
       });
@@ -189,15 +195,17 @@ export async function updateApplicantStatusHandler(req: Request, res: Response) 
     // Handle any other unexpected errors
     return res.status(500).json({
       status: 500,
-      message: 'An unexpected error occurred.',
+      message: "An unexpected error occurred.",
       data: null,
       success: false,
     });
   }
 }
 
-
-export async function findApplicantsByPositionHandler(req: Request, res: Response) {
+export async function findApplicantsByPositionHandler(
+  req: Request,
+  res: Response
+) {
   try {
     // Extract positionId from URL parameters
     const { positionId } = req.params;
@@ -290,6 +298,42 @@ export async function aiBasedSearchHandler(req: Request, res: Response) {
     return res.status(400).json({
       status: 400,
       message: "An error occurred while performing the AI-based search",
+      data: null,
+      success: false,
+    });
+  }
+}
+
+export async function getApplicantsByPositionHandler(
+  req: Request,
+  res: Response
+) {
+  const positionId = parseInt(req.params.positionId, 10); // Extract positionId from URL parameter
+
+  if (isNaN(positionId)) {
+    return res.status(400).json({
+      status: 400,
+      message: "Invalid position ID",
+      data: null,
+      success: false,
+    });
+  }
+
+  try {
+    const applicants = await getApplicantsByPositionWithSortingMatchScore(
+      positionId
+    );
+    return res.status(200).json({
+      status: 200,
+      message: "Applicants retrieved successfully",
+      data: applicants,
+      success: true,
+    });
+  } catch (error: any) {
+    console.error(error.message);
+    return res.status(500).json({
+      status: 500,
+      message: "Failed to retrieve applicants",
       data: null,
       success: false,
     });
