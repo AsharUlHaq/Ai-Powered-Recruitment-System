@@ -7,12 +7,14 @@ import {
   aiBasedSearchHandler,
   getApplicantsByPositionHandler,
 } from "./applicants.controller";
+import { protect } from "../../../middleware/protect.middleware";
 
 const adminPortalApplicantRoutes = Router();
 
 // Route to get applicants by status (draft, hired, rejected)
 adminPortalApplicantRoutes.get(
   "/getApplicantByStatus/status",
+  protect,
   getApplicantsHandler
 );
 
@@ -22,6 +24,7 @@ adminPortalApplicantRoutes.get("/getOneApplicant/:id", getApplicantByIdHandler);
 // Route to update applicant status (hire or reject)
 adminPortalApplicantRoutes.patch(
   "/applicantStatus/:id",
+  protect,
   updateApplicantStatusHandler
 );
 

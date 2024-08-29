@@ -184,8 +184,8 @@ export async function updateApplicantStatusHandler(
 
     // Handle Prisma-specific errors
     if (error.message.includes("Failed to update applicant status")) {
-      return res.status(500).json({
-        status: 500,
+      return res.status(400).json({
+        status: 400,
         message: "An error occurred while updating the applicant status.",
         data: null,
         success: false,
@@ -193,8 +193,8 @@ export async function updateApplicantStatusHandler(
     }
 
     // Handle any other unexpected errors
-    return res.status(500).json({
-      status: 500,
+    return res.status(400).json({
+      status: 400,
       message: "An unexpected error occurred.",
       data: null,
       success: false,

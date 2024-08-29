@@ -58,7 +58,7 @@
 //   });
 // }
 
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -68,20 +68,46 @@ export async function getAllPositions() {
 }
 
 // Create a new position
+// export async function createPosition(data: {
+//   title: string;
+//   experience?: string;
+//   numberOfOpenings: number;
+//   description: string;
+// }) {
+//   return await prisma.position.create({
+//     data: {
+//       title: data.title,
+//       experience: data.experience ?? "",
+//       numberOfOpenings: data.numberOfOpenings,
+//       description: data.description,
+//     },
+//   });
+// }
+
 export async function createPosition(data: {
   title: string;
   experience?: string;
   numberOfOpenings: number;
   description: string;
 }) {
-  return await prisma.position.create({
-    data: {
-      title: data.title,
-      experience: data.experience ?? "",
-      numberOfOpenings: data.numberOfOpenings,
-      description: data.description,
-    },
-  });
+  try {
+    return await prisma.position.create({
+      data: {
+        title: data.title,
+        experience: data.experience ?? "",
+        numberOfOpenings: data.numberOfOpenings,
+        description: data.description,
+      },
+    });
+  } catch (error: any) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        // Unique constraint violation
+        throw new Error(`Position with title '${data.title}' already exists.`);
+      }
+    }
+    throw error.message; // Re-throw if it's not a known Prisma error
+  }
 }
 
 // Update an existing position by ID
