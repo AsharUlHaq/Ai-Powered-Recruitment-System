@@ -121,8 +121,9 @@
 
 import axios from "axios";
 import prisma from "../../../utils/db.util";
+import { ENV } from "../../../utils/env.util";
 
-const FLASK_SERVER_URL = "https://537e-34-80-65-59.ngrok-free.app/comparison"; // Replace with your Flask server URL
+const FLASK_SERVER_URL: string = ENV.FLASK_SERVER_URL as string;
 
 export async function calculateMatchScore(
   jobDescription: string,

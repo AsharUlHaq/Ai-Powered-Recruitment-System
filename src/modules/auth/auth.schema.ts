@@ -12,7 +12,10 @@ export const userSignUpSchema = z.object({
 export type SignUpType = z.infer<typeof userSignUpSchema>;
 
 export const userSignInSchema = z.object({
-  email: z.string().email({ message: "Invalid, Enter valid email address" }),
+  email: z
+    .string()
+    .email({ message: "Invalid, Enter valid email address" })
+    .min(5),
   password: z.string(),
 });
 

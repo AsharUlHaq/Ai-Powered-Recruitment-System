@@ -3,7 +3,7 @@ import { findUserById, getUserById } from "./user.service";
 
 export async function getLoggedInUserHandler(req: Request, res: Response) {
   try {
-    const userId = (req as any).userId; // Assuming userId is attached by the protect middleware
+    const userId = (req as any).userId;
 
     if (!userId) {
       return res.status(401).json({
@@ -36,8 +36,8 @@ export async function getLoggedInUserHandler(req: Request, res: Response) {
     });
   } catch (error: any) {
     console.error(error);
-    return res.status(500).json({
-      status: 500,
+    return res.status(400).json({
+      status: 400,
       message: "An error occurred while retrieving user data.",
       data: null,
       success: false,

@@ -44,12 +44,11 @@ export async function SignInUserHandler(req: Request, res: Response) {
     const user = await findUserByEmail(data.email);
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("Invalid Credentials...");
     }
 
     const isCorrect = await bcrypt.compare(data.password, user.password);
     if (!isCorrect) throw new Error("Invalid credentials");
-    // if (user.isActive == false) throw new Error("Account disabled...");
     const { password, ...rest } = user;
     const token = sign(rest, ENV.JWT_SECRET, { expiresIn: "1d" });
 

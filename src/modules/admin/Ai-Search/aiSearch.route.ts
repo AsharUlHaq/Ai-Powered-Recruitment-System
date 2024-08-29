@@ -1,9 +1,9 @@
-import { Router } from 'express';
-import { evaluateApplicant } from './aiSearch.controller';
+// import { Router } from 'express';
+// import { evaluateApplicant } from './aiSearch.controller';
 
-const aiRoutes = Router();
+// const aiRoutes = Router();
 
-// Route to evaluate applicant using AI
-aiRoutes.post('/ai/evaluate', evaluateApplicant);
+// // Route to evaluate applicant using AI
+// aiRoutes.post('/ai/evaluate', evaluateApplicant);
 
-export { aiRoutes };
+// export { aiRoutes };
