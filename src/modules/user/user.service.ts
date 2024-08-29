@@ -18,3 +18,14 @@ export async function findUserById(id: number) {
     }
   }
 }
+
+export async function getUserById(userId: number) {
+  try {
+    return await prisma.user.findUnique({
+      where: { id: userId },
+    });
+  } catch (error: any) {
+    console.error("Error fetching user by ID:", error.message);
+    throw new Error("Failed to retrieve user data");
+  }
+}

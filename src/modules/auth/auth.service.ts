@@ -11,6 +11,7 @@ export async function SignUp(data: ICreateUser) {
   try {
     const user = await prisma.user.create({
       data: {
+        username: data.username,
         email: data.email,
         password: data.password,
       },
