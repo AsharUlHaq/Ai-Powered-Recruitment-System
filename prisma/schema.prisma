@@ -41,9 +41,11 @@ model Applicant {
   resumeUrl   String
   status      ApplicationStatus @default(DRAFT)
   matchScore  Int?
+  insights    String?           
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 }
+
 
 enum Role {
   ADMIN
