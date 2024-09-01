@@ -132,3 +132,67 @@ export async function getApplicantsByPositionWithSortingMatchScore(
 
   return applicants;
 }
+
+// ---------------------
+
+// export async function updateApplicantStatus(
+//   id: number,
+//   status: ApplicationStatus,
+//   positionId: number
+// ) {
+//   try {
+//     // Check if the position is filled before updating the applicant status
+//     const isFilled = await isPositionFilled(positionId);
+//     if (isFilled) {
+//       throw new Error("Position is already filled");
+//     }
+
+//     await prisma.applicant.update({
+//       where: { id },
+//       data: { status },
+//     });
+
+//     // Check if the position is now filled and deactivate it if necessary
+//     const filledPositions = await prisma.applicant.count({
+//       where: { positionId, status: "HIRED" },
+//     });
+
+//     const position = await prisma.position.findUnique({
+//       where: { id: positionId },
+//     });
+
+//     if (!position) {
+//       throw new Error("Position not found");
+//     }
+
+//     if (filledPositions >= position.numberOfOpenings) {
+//       await prisma.position.update({
+//         where: { id: positionId },
+//         data: { isActive: false },
+//       });
+//     }
+//   } catch (error: any) {
+//     if (error instanceof PrismaClientKnownRequestError) {
+//       // Handle specific Prisma error
+//       console.error("Prisma error:", error.message);
+//     }
+//     console.error("Failed to update applicant status:", error);
+//     throw new Error("Failed to update applicant status");
+//   }
+// }
+
+// export async function isPositionFilled(positionId: number) {
+//   const filledPositions = await prisma.applicant.count({
+//     where: { positionId, status: "HIRED" },
+//   });
+
+//   const position = await prisma.position.findUnique({
+//     where: { id: positionId },
+//   });
+
+//   if (!position) {
+//     throw new Error("Position not found");
+//   }
+
+//   return filledPositions >= position.numberOfOpenings;
+// }

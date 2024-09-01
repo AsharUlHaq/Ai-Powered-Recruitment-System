@@ -339,3 +339,89 @@ export async function getApplicantsByPositionHandler(
     });
   }
 }
+//---------------
+
+// export async function updateApplicantStatusHandler(
+//   req: Request,
+//   res: Response
+// ) {
+//   const id = parseInt(req.params.id);
+//   const { status, positionId } = req.query;
+
+//   try {
+//     // Validate request body
+//     updateApplicantStatusSchema.parse({ status, positionId });
+
+//     if (isNaN(id)) {
+//       return res.status(400).json({
+//         status: 400,
+//         message: "Invalid applicant ID provided.",
+//         data: null,
+//         success: false,
+//       });
+//     }
+
+//     // Ensure the status is a valid ApplicationStatus
+//     if (
+//       !Object.values(ApplicationStatus).includes(status as ApplicationStatus)
+//     ) {
+//       return res.status(400).json({
+//         status: 400,
+//         message: "Invalid status value provided.",
+//         data: null,
+//         success: false,
+//       });
+//     }
+
+//     const positionIdNumber = parseInt(positionId as string);
+
+//     if (isNaN(positionIdNumber)) {
+//       return res.status(400).json({
+//         status: 400,
+//         message: "Invalid position ID provided.",
+//         data: null,
+//         success: false,
+//       });
+//     }
+
+//     // Attempt to update applicant status
+//     await updateApplicantStatus(id, status as ApplicationStatus, positionIdNumber);
+
+//     return res.status(200).json({
+//       status: 200,
+//       message: "Applicant status updated successfully.",
+//       data: null,
+//       success: true,
+//     });
+//   } catch (error: any) {
+//     console.error(error);
+
+//     // Handle Zod validation errors
+//     if (error instanceof ZodError) {
+//       return res.status(400).json({
+//         status: 400,
+//         message: "Invalid input provided.",
+//         data: null,
+//         success: false,
+//       });
+//     }
+
+//     // Handle Prisma-specific errors
+//     if (error.message.includes("Failed to update applicant status")) {
+//       return res.status(400).json({
+//         status: 400,
+//         message: "An error occurred while updating the applicant status.",
+//         data: null,
+//         success: false,
+//       });
+//     }
+
+//     // Handle any other unexpected errors
+//     return res.status(400).json({
+//       status: 400,
+//       message: "An unexpected error occurred.",
+//       data: null,
+//       success: false,
+//     });
+//   }
+// }

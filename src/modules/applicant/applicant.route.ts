@@ -1,5 +1,4 @@
 import { Router } from "express";
-import multer from "multer";
 import { submitApplicant } from "./applicant.controller";
 
 const applicantRoutes = Router();
