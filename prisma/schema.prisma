@@ -20,7 +20,7 @@ model User {
 model Position {
   id               Int         @id @default(autoincrement())
   title            String      @unique
-  experience       String
+  experience       Float
   numberOfOpenings Int
   isActive         Boolean     @default(true)
   description      String
@@ -41,11 +41,10 @@ model Applicant {
   resumeUrl   String
   status      ApplicationStatus @default(DRAFT)
   matchScore  Int?
-  insights    String?           
+  insights    String?
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 }
-
 
 enum Role {
   ADMIN

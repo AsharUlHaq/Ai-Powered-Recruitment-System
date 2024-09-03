@@ -17,7 +17,7 @@ export async function createApplicant(data: any) {
         resumeUrl: data.resumeUrl,
       },
       include: {
-        appliedFor: true, // Include the related position data
+        appliedFor: true,
       },
     });
     return applicant;

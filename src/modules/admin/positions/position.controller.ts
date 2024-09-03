@@ -29,6 +29,7 @@ export async function getAllPositionsHandler(req: Request, res: Response) {
   }
 }
 
+// Handler to create positions
 export async function createPositionHandler(req: Request, res: Response) {
   try {
     const validationResult = positionSchema.parse(req.body);
