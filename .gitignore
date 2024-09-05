@@ -1,4 +1,4 @@
 /node_modules
 .env
 dist
-src/aiprs-ba699-firebase-adminsdk-7akpp-65b64a6544.json
+./uploads

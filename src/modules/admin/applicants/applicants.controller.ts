@@ -16,6 +16,8 @@ import {
 } from "./applicants.schema";
 import { ZodError } from "zod";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Prisma } from "@prisma/client";
+import prisma from "../../../utils/db.util";
 
 export async function getApplicantsHandler(req: Request, res: Response) {
   const status = req.query.status as ApplicationStatus;

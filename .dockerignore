@@ -1,0 +1,20 @@
+# node_modules
+# npm-debug.log
+# Dockerfile
+# .dockerignore
+# .git
+# .gitignore
+# .vscode
+# *.md
+# ./dist
+# ./uploads
+
+/node_modules
+/.git
+/.vscode
+/npm-debug.log
+/.env
+dist
+uploads
+*.md
+!src/utils/aiprs-ba699-firebase-adminsdk-7akpp-7285ecac38.json

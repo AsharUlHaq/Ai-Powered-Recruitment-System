@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  app:
+    image: ai-recruitment-system
+    container_name: ai_recruitment_app
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - DATABASE_URL=postgresql://postgres:1234@db:5432/Ai-Powered-Recruitment-System?schema=public
+      - JWT_ACCESS_SECRET=SECRET
+      - JWT_ACCESS_EXP=1h
+      - JWT_REFRESH_SECRET=SECRET
+      - JWT_REFRESH_EXP=1d
+      - FLASK_SERVER_URL=https://8774-34-32-206-121.ngrok-free.app/comparison
+      - EMAIL_USER=asharulhaq3@gmail.com
+      - EMAIL_PASS=mtuf bdem yhyo orxh
+    depends_on:
+      - db
+    volumes:
+      - .:/src
+      - /src/node_modules
+
+  db:
+    image: postgres:13
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: Ai-Powered-Recruitment-System
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
